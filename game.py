@@ -2,6 +2,10 @@ import time
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.common.by import By
+
+ 
+
 
 from ai import *
 from move import *
@@ -15,11 +19,12 @@ class Algorithm(Enum):
 class Game2048:
 
     def __init__(self):
-        self.browser = webdriver.Firefox(executable_path='/usr/local/bin/geckodriver')
+        self.browser = webdriver.Chrome()
         self.browser.get(url='https://play2048.co/')
         self.browser.set_window_position(0, 0)
         self.browser.set_window_size(1024, 1024)
-        self.htmlElem = self.browser.find_element_by_tag_name('html')
+        #self.htmlElem = self.browser.find_element_by_tag_name('html')
+        self.htmlElem = self.browser.find_element(by=By.TAG_NAME, value="html")
         self.engine2048 = Engine2048()
         self.actual_score = 0
         self.has_won_flag = False
@@ -31,11 +36,21 @@ class Game2048:
         """
         # Parse the current score
         try:
-            elem = self.browser.find_element_by_class_name('score-container')
+            elem = self.browser.find_element(By.CLASS_NAME,".score-container")
             self.actual_score = int(elem.text)
+            print ("score")
         except:
             pass
+            
+        try:
+            elem = self.browser.find_element(By.CLASS_NAME,"grid-cell")
+            print("grid-cell find")
+        except:
+            print("grid-cell not find")
+            
 
+     
+                  
         game = Grid2048()
 
         range_str = ["1", "2", "3", "4"]
@@ -44,7 +59,8 @@ class Game2048:
         for x in range_str:
             for y in range_str:
                 try:
-                    elements = self.browser.find_elements_by_class_name('tile-position-' + x + '-' + y)
+                    #elements = self.browser.find_element(By.CLASS_NAME,"tile-position-" + x + '-' + y)
+                    elements = self.browser.find_elements(By.CLASS_NAME, f"tile-position-{x}-{y}")
                     max_grid_cell_val = 0
 
                     if len(elements) > 0:
@@ -95,7 +111,8 @@ class Game2048:
                 if not self.has_won_flag:
                     if game.has_won():
                         time.sleep(5)
-                        self.browser.find_element_by_css_selector('.keep-playing-button').click()
+                        #self.browser.find_element_by_css_selector('.keep-playing-button').click()
+                        self.browser.find_element(By.CSS_SELECTOR, '.keep-playing-button').click()
                         time.sleep(5)
                         self.has_won_flag = True
                         wins += 1
@@ -129,7 +146,8 @@ class Game2048:
             # ////////////////////////// NEW GAME //////////////////////////////
             if i < nbr_runs:
                 time.sleep(2)
-                self.browser.find_element_by_css_selector('.restart-button').click()
+                #self.browser.find_element_by_css_selector('.restart-button').click()
+                self.browser.find_element(By.CSS_SELECTOR, '.restart-button').click()
                 self.has_won_flag = False
                 time.sleep(2)
 
